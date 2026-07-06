@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My English Note</title>
+        <link rel="stylesheet" href="/src/styles.css" />
+    </head>
+    <body>
+        <main>
+            <h1>My English Note</h1>
+
+            <section>
+                <h2>단어 노트</h2>
+            
+
+                <form id="word-form">
+                    <label>
+                        영어
+                        <input id="english-input" type="text" />
+                    </label>
+
+                    <label>
+                        뜻
+                        <input id="korean-input" type="text" />
+                    </label>
+
+                    <button type="submit">저장</button>
+                </form>
+            </section>
+
+            <section>
+                <h2>저장한 단어</h2>
+                <ul id="word-list"></ul>
+            </section>
+        </main>
+
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>
