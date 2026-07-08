@@ -11,18 +11,41 @@
             <h1>My English Note</h1>
 
             <section>
-                <h2>단어 노트</h2>
-            
+                <h2>노트 선택</h2>
+                <div class="note-tabs" aria-label="노트 선택">
+                    <button class="note-tab active" type="button" data-note-type="word">단어</button>
+                    <button class="note-tab" type="button" data-note-type="phrasalVerb">구동사</button>
+                    <button class="note-tab" type="button" data-note-type="sentence">문장</button>
+                </div>
+            </section>
 
-                <form id="word-form">
+            <section>
+                <h2 id="current-note-title">단어 노트</h2>
+
+                <form id="item-form">
                     <label>
-                        영어
+                        <span id="english-label">영어 단어</span>
                         <input id="english-input" type="text" />
                     </label>
 
                     <label>
-                        뜻
+                        <span id="korean-label">한국어 뜻</span>
                         <input id="korean-input" type="text" />
+                    </label>
+
+                    <label id="source-field" class="hidden">
+                        출처
+                        <input id="source-input" type="text" />
+                    </label>
+
+                    <label>
+                        예문
+                        <input id="example-input" type="text" />
+                    </label>
+
+                    <label>
+                        메모
+                        <input id="memo-input" type="text" />
                     </label>
 
                     <button type="submit">저장</button>
@@ -30,8 +53,9 @@
             </section>
 
             <section>
-                <h2>저장한 단어</h2>
-                <ul id="word-list"></ul>
+                <h2 id="list-title">저장한 단어</h2>
+                <p id="empty-message" class="empty-message">아직 저장한 항목이 없습니다.</p>
+                <ul id="item-list"></ul>
             </section>
         </main>
 
