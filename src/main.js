@@ -12,6 +12,7 @@ const listTitle = document.querySelector("#list-title");
 const englishLabel = document.querySelector("#english-label");
 const koreanLabel = document.querySelector("#korean-label");
 const noteTabs = document.querySelectorAll(".note-tab");
+const searchInput = document.querySelector("#search-input");
 
 const noteLabels = {
   word: {
@@ -41,12 +42,17 @@ const notebookItems = {
 };
 
 let currentNoteType = "word";
+let editingItemId = null;
 
 noteTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
     currentNoteType = tab.dataset.noteType;
     updateNoteView();
   });
+});
+
+searchInput.addEventListener("input", function () {
+  renderItems();
 });
 
 itemForm.addEventListener("submit", function (event) {
@@ -74,7 +80,28 @@ itemForm.addEventListener("submit", function (event) {
     updatedAt: now,
   };
 
-  notebookItems[currentNoteType].push(newItem);
+  if (editingItemId === null){
+    notebookItems[currentNoteType].push(newItem);
+  }
+  else{
+    notebookItems[currentNoteType] = notebookItems[currentNoteType].map(function (savedItem) {
+      if (savedItem.id === editingItemId){
+        return {
+          ...savedItem,
+          english: english,
+          korean: korean,
+          example: exampleInput.value.trim(),
+          memo: memoInput.value.trim(),
+          source: sourceInput.value.trim(),
+          updatedAt: now,
+        };
+      }
+
+      return savedItem;
+    });
+
+    editingItemId = null;
+  }
 
   itemForm.reset();
   renderItems();
@@ -99,26 +126,59 @@ function updateNoteView() {
 
 function renderItems() {
   const currentItems = notebookItems[currentNoteType];
+  const searchText = searchInput.value.trim().toLowerCase();
+
+  const filteredItems = currentItems.filter(function (item) {
+    return (
+      item.english.toLowerCase().includes(searchText) ||
+      item.korean.toLowerCase().includes(searchText)
+    );
+  });
 
   itemList.innerHTML = "";
-  emptyMessage.classList.toggle("hidden", currentItems.length > 0);
+  emptyMessage.classList.toggle("hidden", filteredItems.length > 0);
 
-  currentItems.forEach(function (item) {
+  filteredItems.forEach(function (item) {
     const listItem = document.createElement("li");
     const title = document.createElement("strong");
     const meaning = document.createElement("span");
     const details = document.createElement("small");
+    const deleteButton = document.createElement("button");
+    const editButton = document.createElement("button");
+  
 
     title.textContent = item.english;
     meaning.textContent = item.korean;
     details.textContent = getItemDetails(item);
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", function (){
+      notebookItems[currentNoteType] = notebookItems[currentNoteType].filter(function (savedItem){
+        return savedItem.id !== item.id;
+      });
 
+      renderItems();
+    });
+
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", function (){
+      editingItemId = item.id;
+
+      englishInput.value = item.english;
+      koreanInput.value = item.korean;
+      exampleInput.value = item.example;
+      memoInput.value = item.memo;
+      sourceInput.value = item.source;
+    });
+
+    
     listItem.append(title, meaning);
 
     if (details.textContent !== "") {
       listItem.appendChild(details);
     }
 
+    listItem.appendChild(deleteButton);
+    listItem.appendChild(editButton);
     itemList.appendChild(listItem);
   });
 }
@@ -140,5 +200,6 @@ function getItemDetails(item) {
 
   return details.join(" / ");
 }
+
 
 updateNoteView();
