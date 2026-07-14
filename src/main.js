@@ -1,3 +1,5 @@
+import { loadItems, saveItems } from "./storage.js";
+
 const itemForm = document.querySelector("#item-form");
 const englishInput = document.querySelector("#english-input");
 const koreanInput = document.querySelector("#korean-input");
@@ -35,11 +37,7 @@ const noteLabels = {
   },
 };
 
-const notebookItems = {
-  word: [],
-  phrasalVerb: [],
-  sentence: [],
-};
+const notebookItems = loadItems();
 
 let currentNoteType = "word";
 let editingItemId = null;
@@ -103,6 +101,7 @@ itemForm.addEventListener("submit", function (event) {
     editingItemId = null;
   }
 
+  saveItems(notebookItems);
   itemForm.reset();
   renderItems();
 });
@@ -156,6 +155,7 @@ function renderItems() {
         return savedItem.id !== item.id;
       });
 
+      saveItems(notebookItems);
       renderItems();
     });
 
