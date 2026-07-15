@@ -16,6 +16,16 @@ const koreanLabel = document.querySelector("#korean-label");
 const noteTabs = document.querySelectorAll(".note-tab");
 const searchInput = document.querySelector("#search-input");
 
+const studyCard = document.querySelector('#study-card');
+const checkAnswerButton = document.querySelector("#check-answer-button");
+const englishToKoreanButton = document.querySelector("#english-to-korean-button");
+const koreanToEnglishButton = document.querySelector("#korean-to-english-button");
+const knownAnswerButton = document.querySelector("#known-answer-button");
+const vagueAnswerButton = document.querySelector("#vague-answer-button");
+const noAnswerButton = document.querySelector("#no-answer-button");
+const studyStatus = document.querySelector("#study-status");
+
+
 const noteLabels = {
   word: {
     title: "단어 노트",
@@ -41,6 +51,8 @@ const notebookItems = loadItems();
 
 let currentNoteType = "word";
 let editingItemId = null;
+let currentStudyItem = null;
+let studyDirection = "englishToKorean";
 
 noteTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -121,6 +133,7 @@ function updateNoteView() {
 
   itemForm.reset();
   renderItems();
+  renderStudyCard();
 }
 
 function renderItems() {
@@ -201,5 +214,86 @@ function getItemDetails(item) {
   return details.join(" / ");
 }
 
+function renderStudyCard(){
+  const currentItems = notebookItems[currentNoteType];
+  const firstItem = currentItems[0];
+  if (firstItem === undefined) {
+    currentStudyItem = null;
+    studyCard.textContent = "학습할 항목이 없습니다.";
+    return;
+  }
+  currentStudyItem = firstItem;
+
+  if (studyDirection === "englishToKorean"){
+    studyCard.textContent = firstItem.english;
+  }
+  if (studyDirection === "koreanToEnglish"){
+    studyCard.textContent = firstItem.korean;
+  }
+
+  if (currentStudyItem.status === "known"){
+    studyStatus.textContent = "알고있음";
+  }
+  else if(currentStudyItem.status === "vague"){
+    studyStatus.textContent = "헷갈림";
+  }
+  else if(currentStudyItem.status === "no"){
+    studyStatus.textContent = "모름";
+  }
+}
+
+checkAnswerButton.addEventListener("click",function(){
+  if (currentStudyItem === null) {
+    return;
+  }
+
+  if (studyDirection === "englishToKorean"){
+    studyCard.textContent = currentStudyItem.korean;
+  }
+  if (studyDirection === "koreanToEnglish"){
+    studyCard.textContent = currentStudyItem.english;
+  }
+})
+
+englishToKoreanButton.addEventListener("click",function(){
+  studyDirection = "englishToKorean";
+  renderStudyCard();
+})
+koreanToEnglishButton.addEventListener("click",function(){
+  studyDirection = "koreanToEnglish";
+  renderStudyCard();
+})
+
+knownAnswerButton.addEventListener("click",function(){
+  if (currentStudyItem === null) {
+    return;
+  }
+  
+  currentStudyItem.status = "known";
+  renderStudyCard();
+  saveItems(notebookItems);
+})
+
+vagueAnswerButton.addEventListener("click",function(){
+  if (currentStudyItem === null) {
+    return;
+  }
+
+  currentStudyItem.status = "vague";
+  renderStudyCard();
+  saveItems(notebookItems);
+})
+
+noAnswerButton.addEventListener("click",function(){
+  if (currentStudyItem === null) {
+    return;
+  }
+
+  currentStudyItem.status = "no";
+  renderStudyCard();
+  saveItems(notebookItems);
+})
+
 
 updateNoteView();
+renderStudyCard();
