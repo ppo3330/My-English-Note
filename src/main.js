@@ -25,6 +25,13 @@ const vagueAnswerButton = document.querySelector("#vague-answer-button");
 const noAnswerButton = document.querySelector("#no-answer-button");
 const studyStatus = document.querySelector("#study-status");
 
+const quizQuestion = document.querySelector("#quiz-question");
+const quizAnswer = document.querySelector("#quiz-answer");
+const quizResult = document.querySelector("#quiz-result");
+const quizCheckButton = document.querySelector("#quiz-check-button");
+const quizSummary = document.querySelector("#quiz-summary");
+const nextQuizButton = document.querySelector("#next-quiz-button");
+const wrongAnswerList = document.querySelector("#wrong-answer-list");
 
 const noteLabels = {
   word: {
@@ -53,6 +60,9 @@ let currentNoteType = "word";
 let editingItemId = null;
 let currentStudyItem = null;
 let studyDirection = "englishToKorean";
+let currentQuizItem = null;
+let quizResults = [];
+let hasCheckedCurrentQuiz = false;
 
 noteTabs.forEach(function (tab) {
   tab.addEventListener("click", function () {
@@ -134,6 +144,8 @@ function updateNoteView() {
   itemForm.reset();
   renderItems();
   renderStudyCard();
+  renderQuizItem()
+  renderQuizSummary();
 }
 
 function renderItems() {
@@ -242,6 +254,48 @@ function renderStudyCard(){
   }
 }
 
+function renderQuizItem(){
+  const currentItems = notebookItems[currentNoteType];
+  quizAnswer.value = "";
+  quizResult.textContent = "";
+  hasCheckedCurrentQuiz = false;
+  if (currentItems.length === 0){
+    currentQuizItem = null;
+    quizQuestion.textContent = "시험 항목이 없습니다.";
+    return;
+  }
+  currentQuizItem = currentItems[Math.floor(Math.random()*currentItems.length)];
+  quizQuestion.textContent = currentQuizItem.english;
+}
+
+function renderQuizSummary(){
+  const sumNum = quizResults.length;
+  const correctAnswerNum = quizResults.filter(result=>result.isCorrect).length;
+  quizSummary.textContent = "정답: " + correctAnswerNum + "개 / 채점한 문제: " + sumNum + "개";
+}
+
+function renderWrongAnswerList(){
+  const wrongAnswers = quizResults.filter(function (result) {
+    return result.isCorrect === false;
+  });
+
+  wrongAnswerList.innerHTML = "";
+
+    wrongAnswers.forEach(function (result) {
+    const listItem = document.createElement("li");
+
+    listItem.textContent =
+      result.question +
+      " / 내 답: " +
+      result.answer +
+      " / 정답: " +
+      result.correctAnswer;
+
+    wrongAnswerList.appendChild(listItem);
+  });
+
+}
+
 checkAnswerButton.addEventListener("click",function(){
   if (currentStudyItem === null) {
     return;
@@ -294,6 +348,47 @@ noAnswerButton.addEventListener("click",function(){
   saveItems(notebookItems);
 })
 
+quizCheckButton.addEventListener("click",function(){
+  if(currentQuizItem === null){
+    return;
+  }
+  const ans = quizAnswer.value.trim();
+  if (hasCheckedCurrentQuiz === true) {
+    quizResult.textContent = "다음을 눌러주세요";
+    return;
+  }
+  let isCorrect = false;
+
+  if (ans === "") {
+    quizResult.textContent = "답을 입력해주세요";
+    return;
+  }
+  else if (ans === currentQuizItem.korean){
+    quizResult.textContent = "정답";
+    isCorrect = true;
+  }
+  else{
+    quizResult.textContent = "오답, 정답: " + currentQuizItem.korean;
+    isCorrect = false;
+  }
+
+  quizResults.push({
+    question: currentQuizItem.english,
+    answer: ans,
+    correctAnswer: currentQuizItem.korean, 
+    isCorrect: isCorrect
+  });
+  hasCheckedCurrentQuiz = true;
+  renderQuizSummary();
+  renderWrongAnswerList();
+})
+
+nextQuizButton.addEventListener("click",function(){
+  renderQuizItem();
+  return;
+})
 
 updateNoteView();
 renderStudyCard();
+renderQuizItem();
+renderWrongAnswerList();

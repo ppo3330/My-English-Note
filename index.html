@@ -81,6 +81,19 @@
                     <p id="study-status">현재 상태: 새 항목</p>
                 </div>
             </section>
+
+            <section>
+                <h2>직접 입력 시험</h2>
+                <div id="quiz-question">문제</div>
+                <input id="quiz-answer" type="text"></input>
+                <button id="quiz-check-button" type="button">정답확인</button>
+                <div id="quiz-result"></div>
+                <button id="next-quiz-button" type="button">다음</button>
+                <div id="quiz-summary">정답: 0개 / 채점한 문제: 0개</div>
+
+                <h2>오답 노트</h2>
+                <ul id="wrong-answer-list"></ul>
+            </section>
         </main>
 
         <script type="module" src="/src/main.js"></script>
